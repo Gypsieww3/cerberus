@@ -1,0 +1,30 @@
+name: Engineering smoke tests
+on:
+  push:
+  pull_request:
+jobs:
+  python-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: RV32I reference check (not RTL)
+        run: python 09_HARDWARE/RV32I_TRACE/tools/verify_reference.py
+      - name: TR-003 static equation check
+        run: python 07_ROBOTICA/calcular.py --mass-kg 2 --lever-m 0.2 --gear-ratio 10 --efficiency 0.6
+      - name: PROMETHEUS synthetic unit smoke check
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, '08_PROMETHEUS')
+          from inspection import inspect
+          ref = [[0]*4 for _ in range(4)]
+          img = [[0]*4 for _ in range(4)]
+          img[1][1]=img[1][2]=img[2][1]=255
+          result = inspect(ref,img,threshold=30,min_area=3,max_mean_shift=255)
+          assert result['state'] == 'DEFECT_CANDIDATE', result
+          assert result['components'][0]['area'] == 3
+          print('PASS: PROMETHEUS synthetic unit check')
+          PY
