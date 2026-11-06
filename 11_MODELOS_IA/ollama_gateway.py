@@ -73,7 +73,7 @@ class OllamaGateway:
             raise ValueError("Invalid token limit")
         if not isinstance(messages, list) or not 2 <= len(messages) <= 26:
             raise ValueError("Need 2..26 chat messages")
-        if messages[0].get("role") != "system":
+        if not isinstance(messages[0], dict) or messages[0].get("role") != "system":
             raise ValueError("First message must be system context")
         length = 0
         allowed_roles = {"system", "user", "assistant"}

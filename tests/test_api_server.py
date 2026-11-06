@@ -142,5 +142,52 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.server.server_address[0], "127.0.0.1")
 
 
+    def test_chat_uses_system_context_and_local_history(self):
+        with patch("api_server.OllamaGateway") as fake:
+            fake.return_value.chat.side_effect = ["Primeira resposta", "Segunda resposta"]
+            request = {"prompt": "Quem és?", "model": "qwen2.5:1.5b",
+                       "mode": "engineering", "max_tokens": 128}
+            status, first = self.http("POST", "/api/v1/chat", request)
+            self.assertEqual(status, 200)
+            self.assertEqual(first["answer"], "Primeira resposta")
+            self.assertEqual(first["tools_executed"], 0)
+            first_call = fake.return_value.chat.call_args_list[0]
+            sent = first_call.args[1]
+            self.assertEqual([message["role"] for message in sent], ["system", "user"])
+            self.assertIn("MOSS/KYVRAEL", sent[0]["content"])
+            self.assertIn("qwen2.5:1.5b", sent[0]["content"])
+            self.assertIn("RV32I-TRACE", sent[0]["content"])
+
+            status, second = self.http("POST", "/api/v1/chat", request)
+            self.assertEqual(status, 200)
+            self.assertEqual(second["answer"], "Segunda resposta")
+            sent_again = fake.return_value.chat.call_args_list[1].args[1]
+            self.assertEqual([m["role"] for m in sent_again],
+                             ["system", "user", "assistant", "user"])
+
+        status, listing = self.http("GET", "/api/v1/chat")
+        self.assertEqual(status, 200)
+        self.assertEqual(len(listing["messages"]), 4)
+        self.assertEqual(listing["messages"][1]["content"], "Primeira resposta")
+        status, cleared = self.http("DELETE", "/api/v1/chat")
+        self.assertEqual(status, 200)
+        self.assertTrue(cleared["cleared"])
+        status, empty = self.http("GET", "/api/v1/chat")
+        self.assertEqual(empty["messages"], [])
+
+    def test_chat_rejects_invalid_input(self):
+        invalid = [
+            {"model": "qwen2.5:1.5b", "prompt": "Hello", "mode": "admin"},
+            {"model": "qwen2.5:1.5b", "prompt": "", "mode": "engineering"},
+            {"model": "qwen2.5:1.5b", "prompt": "Hello", "max_tokens": 9999},
+            {"model": "qwen2.5:1.5b", "prompt": "Hello", "tools": ["shell"]},
+        ]
+        for value in invalid:
+            status, body = self.http("POST", "/api/v1/chat", value)
+            self.assertEqual(status, 422, value)
+        status, _ = self.http("GET", "/api/v1/chat", authorized=False)
+        self.assertEqual(status, 401)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -60,5 +60,29 @@ class Tests(unittest.TestCase):
                 OllamaGateway().list_models()
 
 
+    def test_chat_adapter_uses_local_api_without_tools(self):
+        gateway = OllamaGateway()
+        reply = DummyResponse({"message": {"role": "assistant", "content": "MOSS pronto."}})
+        messages = [{"role": "system", "content": "You are a local assistant"},
+                    {"role": "user", "content": "Who are you?"}]
+        with patch("ollama_gateway.request.OpenerDirector.open", return_value=reply) as opened:
+            response = gateway.chat("qwen2.5:1.5b", messages, max_tokens=128)
+            self.assertEqual(response, "MOSS pronto.")
+            req = opened.call_args.args[0]
+            self.assertEqual(req.full_url, "http://127.0.0.1:11434/api/chat")
+            data = json.loads(req.data)
+            self.assertEqual(data["messages"], messages)
+            self.assertFalse(data["stream"])
+            self.assertNotIn("tools", data)
+
+    def test_chat_rejects_invalid_roles(self):
+        with self.assertRaises(ValueError):
+            OllamaGateway().chat("qwen2.5:1.5b",
+                                 [{"role": "system", "content": "Context"},
+                                  {"role": "tool", "content": "Run shell"}])
+        with self.assertRaises(ValueError):
+            OllamaGateway().chat("qwen2.5:1.5b", [{"content": "missing role"}, {"role": "user", "content": "Hi"}])
+
+
 if __name__ == "__main__":
     unittest.main()
