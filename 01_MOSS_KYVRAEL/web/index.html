@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>MOSS Lab | C.E.R.B.E.R.U.S.</title>
+<link rel="stylesheet" href="/app.css"><script src="/app.js" defer></script>
+</head>
+<body>
+<header>
+<div><small>C.E.R.B.E.R.U.S. / ENGINEERING</small><h1>MOSS Lab</h1></div>
+<div class="status"><span class="pill">127.0.0.1 · LOCAL</span><span id="server-status" role="status">A verificar servidor</span></div>
+</header>
+<main>
+<section class="intro"><h2>Centro de engenharia local</h2>
+<p>Gestão de missões, planos supervisionados, memória e modelos Ollama instalados no teu computador.
+As pré-visualizações não executam comandos ou operações externas.</p></section>
+<section class="panel">
+<h2>Acesso local</h2>
+<form id="auth-form">
+<label for="token">Token de acesso (mostrado no CMD)</label>
+<div class="form-row"><input id="token" type="password" required autocomplete="off" spellcheck="false" placeholder="Cola o token desta sessão"><button type="submit">Ligar</button><button type="button" id="disconnect" class="secondary">Desligar</button></div>
+</form>
+<p class="muted">O token não é guardado em cookies ou no armazenamento do navegador. Não o partilhes.</p>
+</section>
+<p id="messages" role="status" aria-live="polite"></p>
+<div class="columns">
+<section class="panel">
+<div class="section-top"><h2>Missões</h2><button type="button" id="refresh" class="secondary" disabled>Atualizar</button></div>
+<form id="mission-form"><label for="mission-title">Criar missão</label><input id="mission-title" maxlength="300" required placeholder="Ex.: rever o processador RV32I"><button type="submit" disabled>Criar missão pendente</button></form>
+<form id="preview-form"><label for="preview-title">Criar plano de pré-visualização</label><input id="preview-title" maxlength="300" required placeholder="Ex.: analisar o código do MOSS">
+<label for="actions">Etapas permitidas</label><select id="actions"><option value="inspect,validate,report">Inspecionar → validar → relatar</option><option value="inspect,summarize">Inspecionar → resumir</option></select>
+<button type="submit" disabled>Criar plano seguro</button></form>
+<div id="mission-list" aria-live="polite"><p class="muted">Liga-te para ver o histórico.</p></div>
+</section>
+<div class="stack">
+<section class="panel">
+<h2>IA local — Ollama</h2>
+<form id="model-form"><label for="model">Modelo instalado</label><select id="model"><option value="qwen2.5:1.5b">qwen2.5:1.5b</option></select>
+<button type="button" id="models-refresh" class="secondary" disabled>Detetar modelos</button>
+<label for="prompt">Mensagem ao modelo</label><textarea id="prompt" rows="5" maxlength="12000" required placeholder="Explica como testar um núcleo RISC-V."></textarea>
+<button type="submit" disabled>Gerar resposta</button></form>
+<pre id="model-answer" tabindex="0" aria-label="Resposta da IA">Nenhuma pergunta enviada.</pre>
+</section>
+<section class="panel">
+<h2>Memória privada</h2>
+<form id="memory-form"><label for="memory-text">Adicionar nota local</label><textarea id="memory-text" rows="3" maxlength="12000" required></textarea><button type="submit" disabled>Guardar nota</button></form>
+<form id="search-form"><label for="memory-query">Pesquisar notas</label><div class="form-row"><input id="memory-query" required placeholder="Palavras da nota"><button type="submit" disabled>Pesquisar</button></div></form>
+<div id="memory-list" aria-live="polite"></div>
+</section>
+</div></div>
+</main>
+<footer>Programa local experimental · MOSS/KYVRAEL completo ainda não integrado · Sem execução de ferramentas pela IA.</footer>
+</body></html>
