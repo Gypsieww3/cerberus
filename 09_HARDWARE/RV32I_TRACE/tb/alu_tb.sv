@@ -1,4 +1,4 @@
-\`timescale 1ns/1ps
+`timescale 1ns/1ps
 module alu_tb;
 logic [31:0] a,b,result;
 logic [3:0] op;
