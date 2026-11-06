@@ -102,6 +102,49 @@
     }
     list.scrollTop = list.scrollHeight;
   }
+  async function loadEngineering() {
+    const [catalog, inventory, history] = await Promise.all([
+      api("/api/v1/engineering/jobs"),
+      api("/api/v1/engineering/inventory"),
+      api("/api/v1/engineering/runs")
+    ]);
+    const select = $("engineering-job");
+    const selected = select.value;
+    select.replaceChildren();
+    for (const job of catalog.jobs) {
+      const option = element("option", job.name + " — " + job.description);
+      option.value = job.name;
+      select.append(option);
+    }
+    if (catalog.jobs.some(job => job.name === selected)) select.value = selected;
+    const grid = $("engineering-inventory");
+    grid.replaceChildren();
+    const summary = element("p",
+      "Ficheiros de código encontrados: " + inventory.total_source_files +
+      " | Fonte presente não significa software concluído.");
+    grid.append(summary);
+    const report = element("div", undefined, "engineering-grid");
+    for (const item of inventory.projects) {
+      const entry = element("div", undefined, "engineering-project");
+      entry.append(element("strong", item.folder));
+      entry.append(element("small", item.source_files + " ficheiros de código · " + item.stage));
+      report.append(entry);
+    }
+    grid.append(report);
+    const runs = $("engineering-runs");
+    runs.replaceChildren();
+    if (!history.runs.length) runs.append(element("p", "Nenhum teste executado.", "muted"));
+    for (const result of history.runs) {
+      const record = element("article", undefined, "engineering-run");
+      record.append(element("strong", "#" + result.id + " " + result.name + " — " + result.status));
+      record.append(element("small", result.requested_at));
+      const details = element("details");
+      details.append(element("summary", "Ver saída de teste"));
+      details.append(element("pre", (result.stdout || "") + "\n" + (result.stderr || "")));
+      record.append(details);
+      runs.append(record);
+    }
+  }
   function form(id, callback) {
     $(id).addEventListener("submit", event => {
       event.preventDefault(); task(callback);
@@ -115,6 +158,7 @@
     setConnected(true);
     await loadMissions();
     await loadChat();
+    await loadEngineering();
     try { await loadModels(); } catch { notify("Ligado. Não foi possível listar modelos.", true); }
   });
   $("disconnect").addEventListener("click", () => {
@@ -122,10 +166,41 @@
     $("mission-list").replaceChildren();
     $("memory-list").replaceChildren();
     $("chat-history").replaceChildren();
+    $("engineering-inventory").replaceChildren();
+    $("engineering-runs").replaceChildren();
+    $("engineering-latest").replaceChildren();
     $("model-answer").textContent = "Sessão desligada.";
     notify("Sessão desligada.");
   });
   $("refresh").addEventListener("click", () => task(loadMissions));
+  $("engineering-refresh").addEventListener("click", () => task(loadEngineering));
+  form("engineering-form", async () => {
+    const job = $("engineering-job").value;
+    if (!job) throw Error("Seleciona uma verificação.");
+    if (!window.confirm("Autorizar a execução local da verificação '" + job +
+                        "'? Será iniciado um processo Python predefinido para testes.")) {
+      notify("Verificação cancelada.");
+      return;
+    }
+    const button = $("engineering-form").querySelector("button[type=submit]");
+    button.disabled = true;
+    $("engineering-latest").textContent = "A executar " + job + "...";
+    try {
+      const result = await api("/api/v1/engineering/run", "POST", {
+        job, operator_approved: true
+      });
+      $("engineering-latest").textContent =
+        result.name + " — " + result.status +
+        (result.duration_s !== null ? " (" + result.duration_s + " s)" : "");
+      await loadEngineering();
+      if (result.status !== "PASS") {
+        throw Error("Verificação terminou com estado " + result.status + ". Consulta a saída.");
+      }
+    } finally {
+      button.disabled = false;
+    }
+  });
+
   $("models-refresh").addEventListener("click", () => task(loadModels));
   $("model").addEventListener("change", showModelIdentity);
   form("mission-form", async () => {

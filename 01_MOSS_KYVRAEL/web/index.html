@@ -52,6 +52,20 @@ As pré-visualizações não executam comandos ou operações externas.</p></sec
 <div id="memory-list" aria-live="polite"></div>
 </section>
 </div></div>
+<section class="panel engineering-panel" aria-labelledby="engineering-title">
+<div class="section-top"><h2 id="engineering-title">Motor de engenharia MOSS</h2>
+<button type="button" id="engineering-refresh" class="secondary" disabled>Atualizar diagnóstico</button></div>
+<p class="muted">Inventário real de ficheiros, execução supervisionada de verificações e histórico dos resultados. Nenhuma ação é iniciada automaticamente pela IA.</p>
+<div id="engineering-inventory" aria-live="polite">Liga-te para consultar os projetos.</div>
+<form id="engineering-form">
+<label for="engineering-job">Verificação permitida</label>
+<select id="engineering-job"></select>
+<button type="submit" disabled>Autorizar e executar verificação</button>
+</form>
+<div id="engineering-latest" role="status" aria-live="polite"></div>
+<h3>Últimas verificações</h3>
+<div id="engineering-runs"></div>
+</section>
 </main>
 <footer>Programa local experimental · MOSS/KYVRAEL completo ainda não integrado · Sem execução de ferramentas pela IA.</footer>
 </body></html>
