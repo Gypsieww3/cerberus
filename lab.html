@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>C.E.R.B.E.R.U.S. | Laboratório de Engenharia</title>
+<meta name="description" content="Estado público e verificável de protótipos experimentais CERBERUS.">
+<style>
+:root{color-scheme:dark;--bg:#060b0c;--card:#10201f;--line:#35534e;--text:#e8f5f0;--muted:#b1c5bd;--mint:#b5fa6e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0%,#1c3930,var(--bg) 55%);font:16px/1.6 system-ui,Segoe UI,sans-serif;color:var(--text)}
+a{color:var(--mint)}a:focus-visible{outline:3px solid var(--mint);outline-offset:5px}header,main,footer{max-width:1200px;margin:auto;padding:26px 24px}
+header{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{font-weight:850;letter-spacing:.13em}h1{font-size:clamp(2.4rem,6vw,5rem);line-height:1.08;letter-spacing:-.05em;margin:32px 0 12px}h2{font-size:clamp(1.35rem,3vw,2rem);margin:35px 0 14px}p{max-width:800px;color:var(--muted)}
+.tag{font:700 .78rem ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--mint)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px}
+article{background:linear-gradient(140deg,#122923,#0b1717);border:1px solid var(--line);padding:21px;border-radius:14px}
+article h3{margin:9px 0 0}article p{font-size:.94rem}
+article a{font-size:.87rem;font-weight:700}small{color:var(--muted)}
+code{color:var(--mint)}.evidence{background:#101e1e;padding:20px;border-radius:12px;border:1px solid var(--line)}
+footer{border-top:1px solid var(--line);margin-top:40px;color:var(--muted);font-size:.84rem}
+</style></head>
+<body><header><div class="brand">C.E.R.B.E.R.U.S. / LAB</div><nav><a href="index.html">Início</a> · <a href="https://github.com/Gypsieww3/cerberus">Código-fonte</a></nav></header>
+<main>
+<div class="tag">Research / Software / Hardware</div>
+<h1>Engenharia com<br>evidências.</h1>
+<p>Este painel documenta projetos experimentais da C.E.R.B.E.R.U.S. A presença de código no GitHub não representa produtos concluídos, testes de hardware físico, resultados financeiros ou desempenho comprovado.</p>
+<section aria-labelledby="portfolio"><h2 id="portfolio">Projetos em desenvolvimento</h2>
+<div class="grid" id="projects">
+<article><small>01 / SOFTWARE</small><h3>MOSS / KYVRAEL</h3><p>Diário de missões, memória local, planos supervisionados e ferramentas experimentais. A integração com o programa original continua em desenvolvimento.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/01_MOSS_KYVRAEL">Ver código MOSS</a></article>
+<article><small>02 / SCIENCE</small><h3>ARKHÉ</h3><p>Protocolos pré-definidos, divisão cronológica de dados e métricas de validação. Nenhuma descoberta científica foi demonstrada.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/02_ARKHE">Ver código ARKHÉ</a></article>
+<article><small>03 / ENGINEERING</small><h3>Laboratório central</h3><p>Execução de testes permitidos, inventário do código, auditoria e projetos separados.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/03_CERBERUS_CORE">Ver ferramentas</a></article>
+<article><small>04 / FINANCIAL R&D</small><h3>KIM / Quant</h3><p>Simulação e análise de estratégias com controlo de risco. Não executa negociações reais.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/05_TRADING">Ver investigação</a></article>
+<article><small>05 / ROBOTICS</small><h3>TR-003</h3><p>Cinemática, torque e estimativas mecânicas. Não constitui certificação de robô ou de segurança física.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/07_ROBOTICA">Ver modelos</a></article>
+<article><small>06 / INDUSTRY</small><h3>PROMETHEUS</h3><p>Algoritmos experimentais de inspeção de imagem e avaliação de conjuntos de dados.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/08_PROMETHEUS">Ver código</a></article>
+<article><small>07 / SILICON</small><h3>RV32I-TRACE</h3><p>Núcleo RISC-V parcial, ALU e testbenches de simulação. Não é um processador fabricado.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/09_HARDWARE/RV32I_TRACE">Ver RTL</a></article>
+<article><small>08 / DEVICE</small><h3>GENESIS X</h3><p>Arquitetura e requisitos do smartphone. Um protótipo físico funcional ainda não foi validado.</p><a href="https://github.com/Gypsieww3/cerberus/tree/main/09_HARDWARE/GENESIS_X">Ver requisitos</a></article>
+</div></section>
+<section aria-labelledby="validation"><h2 id="validation">Validação de código</h2>
+<div class="evidence"><p id="ci-state" role="status" aria-live="polite">A consultar os resultados públicos mais recentes do GitHub Actions...</p>
+<a id="ci-link" href="https://github.com/Gypsieww3/cerberus/actions">Consultar testes e relatórios no GitHub</a>
+<p><small>Um teste aprovado certifica apenas o comportamento exercitado pelo teste naquele ambiente. Não substitui medições reais, revisão de segurança ou validação profissional.</small></p></div></section>
+</main><footer>C.E.R.B.E.R.U.S. · Investigação experimental · Curitiba, Brasil</footer>
+<script>
+(async function(){
+  const status=document.getElementById('ci-state');
+  const link=document.getElementById('ci-link');
+  try{
+    const response=await fetch('https://api.github.com/repos/Gypsieww3/cerberus/actions/runs?per_page=15',{headers:{'Accept':'application/vnd.github+json'}});
+    if(!response.ok)throw new Error('API indisponível');
+    const data=await response.json();
+    const run=(data.workflow_runs||[]).find(x=>x.name==='CERBERUS engineering tests');
+    if(!run)throw new Error('Nenhuma execução encontrada');
+    status.textContent='Última execução de engenharia: '+run.status+(run.conclusion?' · '+run.conclusion:'')+'.';
+    if(run.html_url && /^https:\/\/github\.com\//.test(run.html_url))link.href=run.html_url;
+  }catch(e){
+    status.textContent='Não foi possível consultar o estado agora. Abre o GitHub Actions para verificar.';
+  }
+})();
+</script></body></html>
