@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import sqlite3
 
-TOKENS=re.compile(r"[^\\W_]+", re.UNICODE)
+TOKENS=re.compile(r"[^\W_]+", re.UNICODE)
 def tokenize(text):
     return Counter(x.lower() for x in TOKENS.findall(text))
 
