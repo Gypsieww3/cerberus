@@ -11,6 +11,7 @@ JOBS={
     "engineering-tests":"tools/test_engineering.py",
     "rv32i-reference":"09_HARDWARE/RV32I_TRACE/tools/verify_reference.py",
     "alu-reference":"09_HARDWARE/RV32I_TRACE/tools/alu_reference.py",
+    "moss-syntax":"tools/check_moss_syntax.py",
 }
 
 def run_job(name, timeout=60):
