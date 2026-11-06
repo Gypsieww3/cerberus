@@ -1,0 +1,38 @@
+[
+  {
+    "id": "GEN-X-001",
+    "description": "Android boot on an appropriate reference board",
+    "stage": "concept",
+    "evidence": []
+  },
+  {
+    "id": "GEN-X-002",
+    "description": "Antenna / cellular / Wi-Fi RF coexistence assessment",
+    "stage": "concept",
+    "evidence": []
+  },
+  {
+    "id": "GEN-X-003",
+    "description": "Satellite connectivity feasibility with licensed provider",
+    "stage": "concept",
+    "evidence": []
+  },
+  {
+    "id": "GEN-X-004",
+    "description": "Battery, charging, thermal and electrical safety",
+    "stage": "concept",
+    "evidence": []
+  },
+  {
+    "id": "GEN-X-005",
+    "description": "Consent-based MOSS client integration tests",
+    "stage": "concept",
+    "evidence": []
+  },
+  {
+    "id": "GEN-X-006",
+    "description": "Manufacturer written feasibility and cost estimate",
+    "stage": "concept",
+    "evidence": []
+  }
+]
