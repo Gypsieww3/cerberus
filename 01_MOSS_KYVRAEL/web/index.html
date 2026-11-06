@@ -35,12 +35,14 @@ As pré-visualizações não executam comandos ou operações externas.</p></sec
 </section>
 <div class="stack">
 <section class="panel">
-<h2>IA local — Ollama</h2>
+<h2>MOSS/KYVRAEL — Assistente local</h2><p class="muted">MOSS é o sistema; o modelo escolhido (Qwen, Llama, Phi, etc.) fornece a linguagem. Sem execução de comandos pela IA.</p>
 <form id="model-form"><label for="model">Modelo instalado</label><select id="model"><option value="qwen2.5:1.5b">qwen2.5:1.5b</option></select>
+<label for="chat-mode">Modo de trabalho</label><select id="chat-mode"><option value="engineering">Engenharia</option><option value="research">Investigação</option><option value="general">Geral</option></select>
 <button type="button" id="models-refresh" class="secondary" disabled>Detetar modelos</button>
 <label for="prompt">Mensagem ao modelo</label><textarea id="prompt" rows="5" maxlength="12000" required placeholder="Explica como testar um núcleo RISC-V."></textarea>
 <button type="submit" disabled>Gerar resposta</button></form>
 <pre id="model-answer" tabindex="0" aria-label="Resposta da IA">Nenhuma pergunta enviada.</pre>
+<div class="section-top"><h3>Histórico local</h3><button type="button" id="chat-clear" class="secondary" disabled>Apagar conversa</button></div><div id="chat-history" class="chat-history" role="log" aria-label="Histórico do diálogo" aria-live="polite"></div>
 </section>
 <section class="panel">
 <h2>Memória privada</h2>

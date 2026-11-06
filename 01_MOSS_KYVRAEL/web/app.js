@@ -74,6 +74,21 @@
     else if (data.models.includes("qwen2.5:1.5b")) select.value = "qwen2.5:1.5b";
     if (!data.models.length) throw Error("O Ollama não tem modelos disponíveis.");
   }
+  async function loadChat() {
+    const data = await api("/api/v1/chat");
+    const list = $("chat-history");
+    list.replaceChildren();
+    if (!data.messages.length) {
+      list.append(element("p", "O histórico está vazio.", "muted"));
+    }
+    for (const item of data.messages) {
+      const card = element("article", undefined, "chat-entry");
+      card.append(element("strong", item.role === "user" ? "Tu" : "MOSS Lab · " + item.model));
+      card.append(element("p", item.content));
+      list.append(card);
+    }
+    list.scrollTop = list.scrollHeight;
+  }
   function form(id, callback) {
     $(id).addEventListener("submit", event => {
       event.preventDefault(); task(callback);
@@ -86,12 +101,14 @@
     $("token").value = "";
     setConnected(true);
     await loadMissions();
+    await loadChat();
     try { await loadModels(); } catch { notify("Ligado. Não foi possível listar modelos.", true); }
   });
   $("disconnect").addEventListener("click", () => {
     token = ""; $("token").value = ""; setConnected(false);
     $("mission-list").replaceChildren();
     $("memory-list").replaceChildren();
+    $("chat-history").replaceChildren();
     $("model-answer").textContent = "Sessão desligada.";
     notify("Sessão desligada.");
   });
@@ -108,11 +125,22 @@
     $("preview-title").value = ""; await loadMissions();
   });
   form("model-form", async () => {
-    $("model-answer").textContent = "A gerar resposta...";
-    const data = await api("/api/v1/ask", "POST", {
-      model: $("model").value, prompt: $("prompt").value, max_tokens: 256
+    $("model-answer").textContent = "A gerar resposta local...";
+    const data = await api("/api/v1/chat", "POST", {
+      model: $("model").value, mode: $("chat-mode").value,
+      prompt: $("prompt").value, max_tokens: 256
     });
     $("model-answer").textContent = data.answer;
+    $("prompt").value = "";
+    await loadChat();
+  });
+  $("chat-clear").addEventListener("click", () => {
+    if (!window.confirm("Apagar permanentemente o histórico local de conversa? As missões e notas permanecem.")) return;
+    task(async () => {
+      await api("/api/v1/chat", "DELETE");
+      $("model-answer").textContent = "Histórico apagado.";
+      await loadChat();
+    });
   });
   form("memory-form", async () => {
     await api("/api/v1/memory", "POST", {text: $("memory-text").value});
