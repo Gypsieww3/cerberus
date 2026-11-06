@@ -11,6 +11,7 @@ Este repositório contém um **MOSS Lab operacional**, independente do arquivo h
 - Auditoria estática (AST) de Python com erros de sintaxe e sinais de execução dinâmica, chamadas de shell ou exceções demasiado genéricas; análise heurística, não certificação de segurança.
 - **Motor de engenharia supervisionado:** quatro tarefas estáticas (testes de regressão, referência RV32I, referência ALU, sintaxe do MOSS), execução Python com `shell=False` e tempo máximo de 120 s.
 - Histórico auditável de testes em SQLite; resultados interrompidos são identificados como `INTERRUPTED` após reinício.
+- Missão de revisão real supervisionada: inventário + auditoria AST + relatório persistido com evidências, sem executar código do projeto ou alterar ficheiros.
 - Autorização explícita do utilizador para cada teste. O modelo de IA **não** pode convocar ferramentas ou executar comandos.
 
 ## Windows
