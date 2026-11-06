@@ -23,6 +23,7 @@ from uuid import UUID
 
 from lexical_memory import MemoryIndex
 from chat_store import ChatStore
+from engineering_tools import EngineeringBusy, EngineeringRunner
 from moss_context import MODES, system_context
 from model_identity import model_identity
 from mission_preview import complete_preview, create_preview
@@ -73,6 +74,7 @@ def create_server(*, data_dir=DEFAULT_DATA, port=8765, token=None):
     server.store = store
     server.memory = memory
     server.chat = ChatStore(directory / "chat.sqlite3")
+    server.engineering = EngineeringRunner(directory / "engineering.sqlite3")
     server.chat_lock = Lock()
     server.auth_token = secret
     return server
@@ -174,6 +176,8 @@ class MOSSHandler(BaseHTTPRequestHandler):
             self.reply(404, {"status": 404, "error": "Requested record not found"})
         except PermissionError as exc:
             self.reply(403, {"status": 403, "error": str(exc)})
+        except EngineeringBusy as exc:
+            self.reply(409, {"status": 409, "error": str(exc)})
         except (ValueError, TypeError) as exc:
             self.reply(422, {"status": 422, "error": str(exc)})
         except (GatewayError, TimeoutError):
@@ -258,6 +262,26 @@ class MOSSHandler(BaseHTTPRequestHandler):
             if not memory.delete(int(identifier)):
                 raise HttpFailure(404, "Note not found")
             self.reply(200, {"deleted": True})
+            return
+        if method == "GET" and path == "/api/v1/engineering/jobs":
+            self.reply(200, {"jobs": self.server.engineering.jobs(),
+                             "policy": "Explicit operator approval, fixed scripts, shell=False"})
+            return
+        if method == "GET" and path == "/api/v1/engineering/inventory":
+            self.reply(200, self.server.engineering.inventory())
+            return
+        if method == "GET" and path == "/api/v1/engineering/runs":
+            self.reply(200, {"runs": self.server.engineering.recent(limit=20)})
+            return
+        if method == "POST" and path == "/api/v1/engineering/run":
+            data = self.read_json()
+            if set(data) != {"job", "operator_approved"}:
+                raise ValueError("job and operator_approved fields required")
+            if data["operator_approved"] is not True:
+                raise PermissionError("Operator approval required")
+            result = self.server.engineering.run(
+                data["job"], operator_approved=True, timeout=120)
+            self.reply(200, result)
             return
         if method == "GET" and path == "/api/v1/chat":
             self.reply(200, {"messages": self.server.chat.history(limit=60),
