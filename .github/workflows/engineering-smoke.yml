@@ -30,3 +30,19 @@ jobs:
         run: bash 09_HARDWARE/RV32I_TRACE/sim/test_alu_linux.sh
       - name: RV32I core testbench
         run: bash 09_HARDWARE/RV32I_TRACE/sim/test_core_linux.sh
+  windows-python-tests:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python syntax check on Windows
+        run: python -m compileall -q 01_MOSS_KYVRAEL 02_ARKHE 03_CERBERUS_CORE 05_TRADING 06_LOTOFACIL 07_ROBOTICA 08_PROMETHEUS 09_HARDWARE 11_MODELOS_IA 12_BACKUPS tests tools
+      - name: Python regression suite on Windows
+        run: python tools/test_engineering.py
+      - name: MOSS Lab CLI on Windows
+        shell: cmd
+        run: |
+          cd 01_MOSS_KYVRAEL
+          ABRIR_MOSS_LAB.bat status
