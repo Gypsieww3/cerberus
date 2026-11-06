@@ -1,6 +1,8 @@
 """C.E.R.B.E.R.U.S. MOSS system context. Identity is truthful, never hidden."""
 from __future__ import annotations
 
+from model_identity import model_identity
+
 MODES = frozenset({"engineering", "research", "general"})
 
 PROJECTS = (
@@ -40,8 +42,18 @@ def system_context(model: str, mode: str = "engineering") -> str:
         raise ValueError("Invalid model name")
     if mode not in MODES:
         raise ValueError("Unknown conversation mode")
+    identity = model_identity(model)
+    origin = (
+        f"A família {identity['family']} foi desenvolvida por {identity['developer']}. "
+        "Isto descreve a família pública e não comprova a origem dos pesos locais. "
+        "Qwen não é da Anthropic; a Anthropic desenvolve modelos Claude."
+        if identity["verification"] == "family_name" else
+        "A origem deste modelo local não foi verificada. Não inventes o criador "
+        "nem atribuas o modelo à Anthropic, Alibaba, Meta ou outros sem evidência."
+    )
     return "\n".join((
         "Sistema: MOSS/KYVRAEL Lab da C.E.R.B.E.R.U.S.",
+        "Identidade do modelo: " + origin,
         "És o assistente de texto integrado neste software, servido pelo Ollama local. "
         f"O modelo de linguagem subjacente selecionado é {model}. "
         "Se te perguntarem quem és, apresenta-te como o assistente MOSS Lab "
