@@ -1,42 +1,40 @@
-"""MOSS mission preview with bounded plans and an auditable journal.
+"""Bounded MOSS mission previews with an auditable journal.
 
-No shell access, file editing, network calls or external actions are exposed.
+No shell, network, file-writing or external tool executor is provided.
 """
-from __future__ import annotations
 from dataclasses import asdict
-import json
 from safe_workflow import Step, plan
 
-ALLOWED_PREVIEW_ACTIONS = frozenset({"inspect", "summarize", "validate", "report"})
-
+PREVIEW_ACTIONS = frozenset({"inspect", "summarize", "validate", "report"})
 
 def create_preview(store, title, steps):
-    """Persist a plan preview. Only read-only action descriptors are allowed."""
     items = list(steps)
     result = plan(items, dry_run=True)
     payload = []
     for step in items:
-        if step.action not in ALLOWED_PREVIEW_ACTIONS or step.requires_approval:
-            raise PermissionError("Only read-only, non-privileged previews can be queued")
-        payload.append(asdict(step))
-    # Journal stores JSON-serializable data, not runnable code.
-    mission_id = store.add(title, {"mode": "preview", "steps": payload, "order": result.order})
-    return {"mission_id": mission_id, "state": "pending", "order": result.order,
+        if step.action not in PREVIEW_ACTIONS or step.requires_approval:
+            raise PermissionError("Read-only plan descriptors only")
+        record = asdict(step)
+        record["dependencies"] = list(record["dependencies"])
+        payload.append(record)
+    identifier = store.add(title, {"mode": "preview", "steps": payload, "order": result.order})
+    return {"mission_id": identifier, "state": "pending", "order": result.order,
             "executed_actions": 0, "dry_run": True}
 
-
 def complete_preview(store, mission_id):
-    """Complete the *preview*, not the actions described by the plan."""
     mission = store.get(mission_id)
     if mission["state"] != "pending" or mission["details"].get("mode") != "preview":
         raise ValueError("Only pending previews may be completed")
-    store.transition(mission_id, "running", "Preview evaluation started; no external actions")
+    store.transition(mission_id, "running", "Evaluating plan, no external actions")
     try:
-        steps = [Step(**s) for s in mission["details"]["steps"]]
+        steps = [Step(identifier=s["identifier"], action=s["action"],
+                      dependencies=tuple(s["dependencies"]),
+                      requires_approval=s["requires_approval"])
+                 for s in mission["details"]["steps"]]
         result = plan(steps, dry_run=True)
-        store.transition(mission_id, "done", "Plan preview validated; executed actions: 0")
-        return {"mission_id": mission_id, "preview_complete": True, "order": result.order,
-                "executed_actions": 0, "dry_run": True}
+        store.transition(mission_id, "done", "Preview completed without external actions")
+        return {"mission_id": mission_id, "order": result.order,
+                "preview_complete": True, "dry_run": True, "executed_actions": 0}
     except Exception:
         store.transition(mission_id, "failed", "Preview validation failed")
         raise
