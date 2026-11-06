@@ -45,3 +45,6 @@ data/logs/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# locally imported legacy MOSS source, never publish without review
+01_MOSS_KYVRAEL/legacy_v5_25_4/
