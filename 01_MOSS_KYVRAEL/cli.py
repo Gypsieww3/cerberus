@@ -44,6 +44,13 @@ def parser_factory():
     note.add_argument("text")
     search = sub.add_parser("memory-search")
     search.add_argument("query")
+    local = sub.add_parser("ollama-check", help="List Ollama models on this PC")
+    local.add_argument("--timeout", type=float, default=8.0)
+    ask = sub.add_parser("ollama-ask", help="Ask a local model; no tool execution")
+    ask.add_argument("prompt", help="Question or task, max 12000 characters")
+    ask.add_argument("--model", default="qwen2.5:1.5b")
+    ask.add_argument("--max-tokens", type=int, default=256)
+    ask.add_argument("--timeout", type=float, default=60.0)
     return parser
 
 def main(argv=None):
@@ -80,6 +87,23 @@ def main(argv=None):
                         "automatic_retry": False})
             elif args.command == "retry":
                 output(request_retry(db, args.mission_id, operator_approved=args.approve))
+        elif args.command in {"ollama-check", "ollama-ask"}:
+            # Import from the shared gateway, not from arbitrary user locations.
+            sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "11_MODELOS_IA"))
+            from ollama_gateway import OllamaGateway, GatewayError
+            try:
+                gateway = OllamaGateway(timeout=args.timeout)
+                if args.command == "ollama-check":
+                    output({"local_endpoint": gateway.endpoint,
+                            "models": gateway.list_models(),
+                            "scope": "Local Ollama only"})
+                else:
+                    answer = gateway.generate(args.model, args.prompt, max_tokens=args.max_tokens)
+                    output({"model": args.model, "answer": answer, "tools_executed": 0,
+                            "note": "AI response is text only, not verified facts or executable actions."})
+            except GatewayError as exc:
+                print(f"ERROR: Ollama not available or returned invalid data ({exc})", file=sys.stderr)
+                return 3
         elif args.command in {"memory-add", "memory-search"}:
             db = MemoryIndex(state / "memory.sqlite3")
             if args.command == "memory-add":

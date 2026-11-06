@@ -41,3 +41,26 @@ class OllamaGateway:
             return output
         except (error.URLError,TimeoutError,OSError,UnicodeError,json.JSONDecodeError) as exc:
             raise GatewayError(f"Local Ollama failure: {type(exc).__name__}") from exc
+
+    def list_models(self):
+        """Fetch model tags from the local Ollama API; performs no generation."""
+        req = request.Request(self.endpoint + "/api/tags", method="GET",
+                              headers={"Accept": "application/json"})
+        class NoRedirect(request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                raise GatewayError("Redirect denied")
+        opener = request.build_opener(request.ProxyHandler({}), NoRedirect())
+        try:
+            with opener.open(req, timeout=self.timeout) as response:
+                payload = response.read(1_000_001)
+            if len(payload) > 1_000_000:
+                raise GatewayError("Response too large")
+            data = json.loads(payload)
+            if not isinstance(data, dict) or not isinstance(data.get("models"), list):
+                raise GatewayError("Invalid model list")
+            names = [x.get("name") for x in data["models"] if isinstance(x, dict)
+                     and isinstance(x.get("name"), str)]
+            return sorted(set(names))
+        except (error.URLError, TimeoutError, OSError, UnicodeError,
+                json.JSONDecodeError) as exc:
+            raise GatewayError(f"Local Ollama failure: {type(exc).__name__}") from exc

@@ -1,22 +1,37 @@
-# MOSS Lab — interface local (Windows / Linux)
+# MOSS Lab — Windows e Ollama local
 
-This CLI is **not** the full MOSS engine. It provides an offline journal, read-only task previews and optional private notes. No external or OS actions are performed by the preview system.
+O MOSS Lab é um protótipo independente do MOSS completo. Permite registar missões e conversar com um modelo **local** sem executar ferramentas, comandos do sistema ou tarefas com efeitos reais.
 
-In Windows CMD:
+## Atualizar o código no CMD
 
-\`\`\`bat
+```bat
+cd /d "%USERPROFILE%\Desktop\cerberus"
+git pull --ff-only
 cd 01_MOSS_KYVRAEL
 ABRIR_MOSS_LAB.bat status
-ABRIR_MOSS_LAB.bat preview "Verificar projeto" --actions inspect,validate,report
-ABRIR_MOSS_LAB.bat list
-ABRIR_MOSS_LAB.bat memory-add "Nota local para testes"
-ABRIR_MOSS_LAB.bat memory-search "testes"
-\`\`\`
+```
 
-On Linux/macOS: \`python 01_MOSS_KYVRAEL/cli.py status\`.
+## Verificar modelos Ollama disponíveis
 
-- Local data: \`~/.cerberus/moss_lab\`. Use \`--data-dir\` to choose a private folder.
-- No cloud sync and no background execution.
-- For preview completion, use \`complete-preview <mission_id>\`. This validates the preview, **not real actions**.
-- For stale running mission recovery, use \`recover --older-than 3600\`. For an explicit retry use \`retry <mission_id> --approve\`.
-- If you remove an archive or local database, keep independent backups; this tool does not include automatic restoration.
+Com o Ollama instalado e em execução no Windows:
+
+```bat
+ollama list
+ABRIR_MOSS_LAB.bat ollama-check
+```
+
+Se não houver modelos, instalá-los exige descarregar dados da internet e espaço livre em disco. O MOSS Lab não faz downloads automáticos.
+
+## Conversar com o modelo instalado
+
+```bat
+ABRIR_MOSS_LAB.bat ollama-ask "Explica o que e uma CPU RISC-V." --model qwen2.5:1.5b
+```
+
+Usa o nome exato devolvido por `ollama list`, se for diferente. Podes ajustar `--max-tokens 256` e `--timeout 60`.
+
+- O servidor é fixo em `http://127.0.0.1:11434`, sem redirecionamentos.
+- A ferramenta envia o texto apenas ao Ollama local e recebe uma resposta; não abre ficheiros, não executa scripts nem controla o PC.
+- As respostas podem conter erros. Verifica qualquer código antes de o executar.
+- Se o Ollama não estiver ligado, o comando apresenta uma mensagem de erro, sem danificar o diário de missões.
+- Os diários e notas privadas ficam em `%USERPROFILE%\.cerberus\moss_lab`, fora do GitHub.
