@@ -14,6 +14,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from threading import Lock
 import secrets
 import sqlite3
 import sys
@@ -21,6 +22,8 @@ from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
 
 from lexical_memory import MemoryIndex
+from chat_store import ChatStore
+from moss_context import MODES, system_context
 from mission_preview import complete_preview, create_preview
 from mission_recovery import recover_stale, request_retry
 from mission_store import MissionStore
@@ -68,6 +71,8 @@ def create_server(*, data_dir=DEFAULT_DATA, port=8765, token=None):
     server.daemon_threads = True
     server.store = store
     server.memory = memory
+    server.chat = ChatStore(directory / "chat.sqlite3")
+    server.chat_lock = Lock()
     server.auth_token = secret
     return server
 
@@ -252,6 +257,43 @@ class MOSSHandler(BaseHTTPRequestHandler):
             if not memory.delete(int(identifier)):
                 raise HttpFailure(404, "Note not found")
             self.reply(200, {"deleted": True})
+            return
+        if method == "GET" and path == "/api/v1/chat":
+            self.reply(200, {"messages": self.server.chat.history(limit=60),
+                             "scope": "local SQLite conversation"})
+            return
+        if method == "DELETE" and path == "/api/v1/chat":
+            with self.server.chat_lock:
+                self.server.chat.clear()
+            self.reply(200, {"cleared": True})
+            return
+        if method == "POST" and path == "/api/v1/chat":
+            data = self.read_json()
+            if (not {"prompt", "model"} <= set(data) or
+                set(data) - {"prompt", "model", "mode", "max_tokens"}):
+                raise ValueError("model and prompt required")
+            prompt, model = data["prompt"], data["model"]
+            mode = data.get("mode", "engineering")
+            max_tokens = data.get("max_tokens", 256)
+            if not isinstance(prompt, str) or not 1 <= len(prompt) <= 4000:
+                raise ValueError("Chat prompt must have 1..4000 characters")
+            if mode not in MODES:
+                raise ValueError("Unsupported conversation mode")
+            if type(max_tokens) is not int or not 1 <= max_tokens <= 512:
+                raise ValueError("max_tokens must be between 1 and 512")
+            system = system_context(model, mode)
+            # Serialize each local conversation turn to preserve chronological order.
+            with self.server.chat_lock:
+                context = self.server.chat.context(max_messages=12, char_budget=12000)
+                messages = [{"role": "system", "content": system}]
+                messages.extend(context)
+                messages.append({"role": "user", "content": prompt})
+                answer = OllamaGateway(timeout=90).chat(
+                    model, messages, max_tokens=max_tokens)
+                self.server.chat.append_exchange(prompt, answer, model=model, mode=mode)
+            self.reply(200, {"model": model, "mode": mode, "answer": answer,
+                             "tools_executed": 0, "history_saved": True,
+                             "scope": "MOSS Lab local Ollama chat"})
             return
         if method == "GET" and path == "/api/v1/models":
             self.reply(200, {"models": OllamaGateway(timeout=8).list_models(),

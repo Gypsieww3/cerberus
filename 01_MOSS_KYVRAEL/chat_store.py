@@ -75,15 +75,19 @@ class ChatStore:
         if type(char_budget) is not int or not 500 <= char_budget <= 24000:
             raise ValueError("Invalid context budget")
         recent = self.history(limit=max_messages)
+        # Keep complete user/assistant exchanges only, newest first.
+        if len(recent) % 2:
+            recent = recent[1:]
+        pairs = [recent[i:i + 2] for i in range(0, len(recent), 2)]
         result = []
         used = 0
-        for item in reversed(recent):
-            chars = len(item["content"])
+        for pair in reversed(pairs):
+            chars = sum(len(item["content"]) for item in pair)
             if used + chars > char_budget:
                 break
-            result.append({"role": item["role"], "content": item["content"]})
+            result[0:0] = [{"role": item["role"], "content": item["content"]} for item in pair]
             used += chars
-        return list(reversed(result))
+        return result
 
     def clear(self):
         with self.connection() as db:
