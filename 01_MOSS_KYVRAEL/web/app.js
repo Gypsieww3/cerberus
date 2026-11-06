@@ -169,11 +169,28 @@
     $("engineering-inventory").replaceChildren();
     $("engineering-runs").replaceChildren();
     $("engineering-latest").replaceChildren();
+    $("engineering-audit-results").replaceChildren();
     $("model-answer").textContent = "Sessão desligada.";
     notify("Sessão desligada.");
   });
   $("refresh").addEventListener("click", () => task(loadMissions));
   $("engineering-refresh").addEventListener("click", () => task(loadEngineering));
+  $("engineering-audit").addEventListener("click", () => task(async () => {
+    $("engineering-audit-results").textContent = "A analisar código Python, sem execução...";
+    const result = await api("/api/v1/engineering/audit");
+    const container = $("engineering-audit-results");
+    container.replaceChildren();
+    container.append(element("p",
+      "Ficheiros analisados: " + result.analyzed +
+      " | Erros de sintaxe: " + result.syntax_errors +
+      " | Alertas heurísticos: " + result.warnings +
+      " | Estado: " + result.status));
+    const detail = element("details");
+    detail.append(element("summary", "Ver indícios e referências"));
+    detail.append(element("pre", JSON.stringify(result.findings, null, 2)));
+    container.append(detail);
+  }));
+
   form("engineering-form", async () => {
     const job = $("engineering-job").value;
     if (!job) throw Error("Seleciona uma verificação.");
