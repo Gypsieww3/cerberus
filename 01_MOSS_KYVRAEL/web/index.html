@@ -59,6 +59,11 @@ As pré-visualizações não executam comandos ou operações externas.</p></sec
 <div id="engineering-inventory" aria-live="polite">Liga-te para consultar os projetos.</div>
 <button type="button" id="engineering-audit" class="secondary" disabled>Analisar código Python (AST)</button>
 <div id="engineering-audit-results" role="status" aria-live="polite"></div>
+<div class="engineering-review-area">
+<button type="button" id="engineering-review" disabled>Autorizar missão real de diagnóstico</button>
+<p class="muted">Executa inventário e auditoria AST sem modificar código; guarda a missão e o relatório localmente.</p>
+<div id="engineering-review-results" role="status" aria-live="polite"></div>
+</div>
 <form id="engineering-form">
 <label for="engineering-job">Verificação permitida</label>
 <select id="engineering-job"></select>

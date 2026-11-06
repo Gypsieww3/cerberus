@@ -170,11 +170,42 @@
     $("engineering-runs").replaceChildren();
     $("engineering-latest").replaceChildren();
     $("engineering-audit-results").replaceChildren();
+    $("engineering-review-results").replaceChildren();
     $("model-answer").textContent = "Sessão desligada.";
     notify("Sessão desligada.");
   });
   $("refresh").addEventListener("click", () => task(loadMissions));
   $("engineering-refresh").addEventListener("click", () => task(loadEngineering));
+  $("engineering-review").addEventListener("click", () => task(async () => {
+    if (!window.confirm("Autorizar uma missão real de diagnóstico read-only? O MOSS vai ler o repositório, analisar sintaxe e guardar evidências em SQLite.")) {
+      notify("Diagnóstico cancelado.");
+      return;
+    }
+    const button = $("engineering-review");
+    button.disabled = true;
+    $("engineering-review-results").textContent = "Missão em execução...";
+    try {
+      const result = await api("/api/v1/engineering/reviews", "POST", {
+        title: "Revisão técnica supervisionada do repositório",
+        operator_approved: true
+      });
+      const output = $("engineering-review-results");
+      output.replaceChildren();
+      output.append(element("p", "Missão " + result.mission_id + " — " + result.report.result));
+      output.append(element("p",
+        "Projetos: " + result.report.inventory.projects.length +
+        " | Ficheiros Python analisados: " + result.report.python_audit.analyzed +
+        " | Falhas de sintaxe: " + result.report.python_audit.syntax_errors +
+        " | Ficheiros alterados: " + result.report.files_modified));
+      const details = element("details");
+      details.append(element("summary", "Abrir relatório completo"));
+      details.append(element("pre", JSON.stringify(result.report, null, 2)));
+      output.append(details);
+      await loadMissions();
+    } finally {
+      button.disabled = false;
+    }
+  }));
   $("engineering-audit").addEventListener("click", () => task(async () => {
     $("engineering-audit-results").textContent = "A analisar código Python, sem execução...";
     const result = await api("/api/v1/engineering/audit");
