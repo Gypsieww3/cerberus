@@ -25,6 +25,7 @@ from lexical_memory import MemoryIndex
 from chat_store import ChatStore
 from engineering_tools import EngineeringBusy, EngineeringRunner
 from engineering_audit import audit_sources
+from engineering_review import EngineeringReviews
 from moss_context import MODES, system_context
 from model_identity import model_identity
 from mission_preview import complete_preview, create_preview
@@ -76,6 +77,7 @@ def create_server(*, data_dir=DEFAULT_DATA, port=8765, token=None):
     server.memory = memory
     server.chat = ChatStore(directory / "chat.sqlite3")
     server.engineering = EngineeringRunner(directory / "engineering.sqlite3")
+    server.reviews = EngineeringReviews(store, directory / "engineering_reviews.sqlite3")
     server.chat_lock = Lock()
     server.auth_token = secret
     return server
@@ -263,6 +265,18 @@ class MOSSHandler(BaseHTTPRequestHandler):
             if not memory.delete(int(identifier)):
                 raise HttpFailure(404, "Note not found")
             self.reply(200, {"deleted": True})
+            return
+        if method == "GET" and path == "/api/v1/engineering/reviews":
+            self.reply(200, {"reviews": self.server.reviews.recent(limit=10)})
+            return
+        if method == "POST" and path == "/api/v1/engineering/reviews":
+            data = self.read_json()
+            if set(data) != {"title", "operator_approved"}:
+                raise ValueError("title and operator_approved required")
+            if data["operator_approved"] is not True:
+                raise PermissionError("Explicit operator approval required")
+            self.reply(201, self.server.reviews.execute(
+                data["title"], operator_approved=True))
             return
         if method == "GET" and path == "/api/v1/engineering/jobs":
             self.reply(200, {"jobs": self.server.engineering.jobs(),
