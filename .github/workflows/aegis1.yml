@@ -1,0 +1,34 @@
+name: AEGIS-1 RTL and reference checks
+on:
+  push:
+    paths:
+      - '09_HARDWARE/AEGIS1/**'
+      - '.github/workflows/aegis1.yml'
+  pull_request:
+    paths:
+      - '09_HARDWARE/AEGIS1/**'
+      - '.github/workflows/aegis1.yml'
+permissions:
+  contents: read
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install open-source simulator
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+      - name: Standalone dot-product RTL test
+        run: |
+          iverilog -g2012 -s aegis_dot4_tb -o /tmp/dot4_tb.vvp \
+            09_HARDWARE/AEGIS1/rtl/aegis_dot4_int8.sv \
+            09_HARDWARE/AEGIS1/tb/aegis_dot4_tb.sv
+          vvp /tmp/dot4_tb.vvp
+      - name: MMIO integration RTL test
+        run: |
+          iverilog -g2012 -s aegis_mmio_tb -o /tmp/mmio_tb.vvp \
+            09_HARDWARE/AEGIS1/rtl/aegis_dot4_int8.sv \
+            09_HARDWARE/AEGIS1/rtl/aegis_neural_mmio.sv \
+            09_HARDWARE/AEGIS1/tb/aegis_mmio_tb.sv
+          vvp /tmp/mmio_tb.vvp
+      - name: Python model unit tests
+        run: python -m unittest discover -s 09_HARDWARE/AEGIS1/tools -p 'test_*.py' -v
