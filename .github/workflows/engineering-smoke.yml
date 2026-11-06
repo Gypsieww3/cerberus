@@ -16,6 +16,8 @@ jobs:
         run: python -m compileall -q 01_MOSS_KYVRAEL 02_ARKHE 03_CERBERUS_CORE 05_TRADING 06_LOTOFACIL 07_ROBOTICA 08_PROMETHEUS 09_HARDWARE 11_MODELOS_IA 12_BACKUPS tests tools
       - name: Regression suite
         run: python tools/test_engineering.py
+      - name: Browser JavaScript syntax check
+        run: node --check 01_MOSS_KYVRAEL/web/app.js
       - name: Reference program (not RTL)
         run: python 09_HARDWARE/RV32I_TRACE/tools/verify_reference.py
       - name: Robotics static model
