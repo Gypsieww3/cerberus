@@ -24,6 +24,7 @@ from uuid import UUID
 from lexical_memory import MemoryIndex
 from chat_store import ChatStore
 from engineering_tools import EngineeringBusy, EngineeringRunner
+from engineering_audit import audit_sources
 from moss_context import MODES, system_context
 from model_identity import model_identity
 from mission_preview import complete_preview, create_preview
@@ -266,6 +267,9 @@ class MOSSHandler(BaseHTTPRequestHandler):
         if method == "GET" and path == "/api/v1/engineering/jobs":
             self.reply(200, {"jobs": self.server.engineering.jobs(),
                              "policy": "Explicit operator approval, fixed scripts, shell=False"})
+            return
+        if method == "GET" and path == "/api/v1/engineering/audit":
+            self.reply(200, audit_sources())
             return
         if method == "GET" and path == "/api/v1/engineering/inventory":
             self.reply(200, self.server.engineering.inventory())
