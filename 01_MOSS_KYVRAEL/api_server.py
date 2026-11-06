@@ -24,6 +24,7 @@ from uuid import UUID
 from lexical_memory import MemoryIndex
 from chat_store import ChatStore
 from moss_context import MODES, system_context
+from model_identity import model_identity
 from mission_preview import complete_preview, create_preview
 from mission_recovery import recover_stale, request_retry
 from mission_store import MissionStore
@@ -293,11 +294,13 @@ class MOSSHandler(BaseHTTPRequestHandler):
                 self.server.chat.append_exchange(prompt, answer, model=model, mode=mode)
             self.reply(200, {"model": model, "mode": mode, "answer": answer,
                              "tools_executed": 0, "history_saved": True,
-                             "scope": "MOSS Lab local Ollama chat"})
+                             "scope": "MOSS Lab local Ollama chat",
+                             "model_identity": model_identity(model)})
             return
         if method == "GET" and path == "/api/v1/models":
-            self.reply(200, {"models": OllamaGateway(timeout=8).list_models(),
-                             "provider": "local_ollama"})
+            models = OllamaGateway(timeout=8).list_models()
+            self.reply(200, {"models": models, "provider": "local_ollama",
+                             "model_details": {name: model_identity(name) for name in models}})
             return
         if method == "POST" and path == "/api/v1/ask":
             data = self.read_json()

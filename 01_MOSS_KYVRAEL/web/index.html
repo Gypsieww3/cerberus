@@ -37,6 +37,7 @@ As pré-visualizações não executam comandos ou operações externas.</p></sec
 <section class="panel">
 <h2>MOSS/KYVRAEL — Assistente local</h2><p class="muted">MOSS é o sistema; o modelo escolhido (Qwen, Llama, Phi, etc.) fornece a linguagem. Sem execução de comandos pela IA.</p>
 <form id="model-form"><label for="model">Modelo instalado</label><select id="model"><option value="qwen2.5:1.5b">qwen2.5:1.5b</option></select>
+<p id="model-identity" class="muted" role="status" aria-live="polite">Informação do modelo: ainda não consultada.</p>
 <label for="chat-mode">Modo de trabalho</label><select id="chat-mode"><option value="engineering">Engenharia</option><option value="research">Investigação</option><option value="general">Geral</option></select>
 <button type="button" id="models-refresh" class="secondary" disabled>Detetar modelos</button>
 <label for="prompt">Mensagem ao modelo</label><textarea id="prompt" rows="5" maxlength="12000" required placeholder="Explica como testar um núcleo RISC-V."></textarea>

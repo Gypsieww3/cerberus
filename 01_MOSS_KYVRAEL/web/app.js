@@ -2,6 +2,7 @@
 (() => {
   "use strict";
   let token = "";
+  let modelDetails = {};
   const $ = id => document.getElementById(id);
   const notify = (text, error = false) => {
     $("messages").textContent = String(text);
@@ -60,8 +61,19 @@
       list.append(card);
     }
   }
+  function showModelIdentity() {
+    const selected = $("model").value;
+    const details = modelDetails[selected];
+    if (!details) {
+      $("model-identity").textContent = "Origem do modelo por verificar.";
+      return;
+    }
+    $("model-identity").textContent = "Família: " + details.family +
+      " | Origem: " + details.developer + " — " + details.note;
+  }
   async function loadModels() {
     const data = await api("/api/v1/models");
+    modelDetails = data.model_details || {};
     const select = $("model");
     const current = select.value;
     select.replaceChildren();
@@ -72,6 +84,7 @@
     }
     if (data.models.includes(current)) select.value = current;
     else if (data.models.includes("qwen2.5:1.5b")) select.value = "qwen2.5:1.5b";
+    showModelIdentity();
     if (!data.models.length) throw Error("O Ollama não tem modelos disponíveis.");
   }
   async function loadChat() {
@@ -114,6 +127,7 @@
   });
   $("refresh").addEventListener("click", () => task(loadMissions));
   $("models-refresh").addEventListener("click", () => task(loadModels));
+  $("model").addEventListener("change", showModelIdentity);
   form("mission-form", async () => {
     await api("/api/v1/missions", "POST", {title: $("mission-title").value});
     $("mission-title").value = ""; await loadMissions();
@@ -131,6 +145,11 @@
       prompt: $("prompt").value, max_tokens: 256
     });
     $("model-answer").textContent = data.answer;
+    // Identity banner comes from server metadata, not generated answer text.
+    if (data.model_identity) {
+      modelDetails[data.model] = data.model_identity;
+      showModelIdentity();
+    }
     $("prompt").value = "";
     await loadChat();
   });
