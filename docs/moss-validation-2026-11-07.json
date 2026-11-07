@@ -1,0 +1,36 @@
+{
+  "project": "MOSS / KYVRAEL",
+  "observed_at_utc": "2026-11-07",
+  "test_scope": "Local Windows development tree MOSS_ATUAL",
+  "checks": {
+    "regression_tests": {
+      "passed": 24,
+      "total": 24
+    },
+    "python_ast_files": {
+      "passed": 112,
+      "total": 112
+    },
+    "doctor": "HEALTHY",
+    "controlled_bugfix_lab": {
+      "repaired": 5,
+      "total": 5,
+      "originals_preserved": true,
+      "source": "authored trusted fixtures only"
+    }
+  },
+  "real_mission_pilot": {
+    "goal": "Analyze a controlled Python defect without external commands or file writes",
+    "step_budget": 6,
+    "permissions": "BLOCKED",
+    "phase": "WAITING_USER",
+    "autonomous_task_completed": false
+  },
+  "limitations": [
+    "No general independent autonomous bug repair demonstrated",
+    "No untrusted model code executed",
+    "No long-running stability or full end-to-end agent qualification",
+    "No hardware validation"
+  ],
+  "note": "Engineering status report. It is not a formal third-party certification."
+}
