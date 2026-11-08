@@ -1,3 +1,5 @@
+> **USO RESTRITO — PROJETOS PROPRIETÁRIOS.** © 2026 Gabriel Filipe Correia, quanto às partes originais de sua titularidade. A visualização deste repositório público **não concede licença para copiar, redistribuir, revender ou usar comercialmente** os componentes proprietários. Só está permitida a interação com a [demonstração pública MOSS](demo/) no navegador, dentro das [condições de avaliação](EVALUATION_TERMS.md). Os direitos de terceiros e eventuais cotitulares legítimos mantêm-se. Consulte [LICENSE](LICENSE) e o [índice de direitos dos 12 projetos](PROJECT_RIGHTS_INDEX.md). **Atenção:** como o repositório é público, o código já publicado é tecnicamente visível e copiável; os avisos não são proteção anticópia.
+
 # C.E.R.B.E.R.U.S. — Engineering & Research Portfolio
 
 **Cognitive Engineering, Robotics, Bio-inspired Evolution & Research for Unified Systems**
