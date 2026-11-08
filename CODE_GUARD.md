@@ -21,6 +21,12 @@ The developer's Windows PC passed 73 of 74 automated tests (one skipped because 
 
 The Windows executable is currently **unsigned**. It must not be run by bypassing corporate antivirus, SmartScreen or security policies. Compatibility with independent client machines has not yet been confirmed.
 
+## Request a demonstration
+
+**Engineering, QA and security teams:** [Open a Code Guard pilot inquiry](https://github.com/Gypsieww3/cerberus/issues/new?template=code-guard-pilot.md) to describe, in public and non-confidential terms, what your team would like to evaluate.
+
+The first demonstration uses **synthetic Python examples only**. Any software delivery, evaluation license or commercial discussion is arranged separately under explicit written terms. Do not share internal repositories, sensitive information, passwords, phone numbers or private company records in a public issue.
+
 ## Pilot availability
 
 A supervised pilot and demonstration can be discussed with authorized engineering/QA teams. Any evaluation requires a **separate written agreement** specifying scope, duration, recipients, rights and support. No license is granted by this public description.
