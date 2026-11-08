@@ -6,6 +6,18 @@
 
 Experimental technology initiative in Curitiba, Brazil. The repository contains independent projects and a shared engineering roadmap. **Not all listed projects are completed or commercially validated.**
 
+## Featured software — CERBERUS Code Guard
+
+**Python static-analysis desktop tool | Windows | Proprietary | Supervised pilot by request**
+
+CERBERUS Code Guard v0.10.0 scans Python source locally for selected risk patterns, supports limited input-to-shell tracing, exports JSON/SARIF/HTML reports, and compares scans across development iterations. It is a **working experimental prototype**, not certified security software. Development-PC validation: **73 tests passed, 1 skipped**; external client validation is still pending.
+
+**For software engineering teams:** [View product overview and technical limitations](CODE_GUARD.md) · [Request a supervised pilot](https://github.com/Gypsieww3/cerberus/issues/new?template=code-guard-pilot.md) · [Read restricted rights](CODE_GUARD_RIGHTS.md)
+
+> **No source code, downloadable executable or software-use license is published for Code Guard here.** Demonstrations and evaluations require prior written agreement. A public issue is visible to everyone; do not post confidential projects, passwords or private company information.
+
+---
+
 ## Projects
 
 | Folder | Project | Stage / existing evidence |
