@@ -1,4 +1,4 @@
-> **USO RESTRITO — PROJETOS PROPRIETÁRIOS.** © 2026 Gabriel Filipe Correia, quanto às partes originais de sua titularidade. A visualização deste repositório público **não concede licença para copiar, redistribuir, revender ou usar comercialmente** os componentes proprietários. Só está permitida a interação com a [demonstração pública MOSS](demo/) no navegador, dentro das [condições de avaliação](EVALUATION_TERMS.md). Os direitos de terceiros e eventuais cotitulares legítimos mantêm-se. Consulte [LICENSE](LICENSE) e o [índice de direitos dos 12 projetos](PROJECT_RIGHTS_INDEX.md). **Atenção:** como o repositório é público, o código já publicado é tecnicamente visível e copiável; os avisos não são proteção anticópia.
+> **USO RESTRITO — PROJETOS PROPRIETÁRIOS.** © 2026 Gabriel Filipe Correia, quanto às partes originais de sua titularidade. A visualização deste repositório público **não concede licença para copiar, redistribuir, revender ou usar comercialmente** os componentes proprietários. Só está permitida a interação com a [demonstração pública MOSS](demo/) no navegador, dentro das [condições de avaliação](EVALUATION_TERMS.md). Os direitos de terceiros e eventuais cotitulares legítimos mantêm-se. Consulte [LICENSE](LICENSE) e o [índice de direitos dos projetos](PROJECT_RIGHTS_INDEX.md). **Atenção:** como o repositório é público, o código já publicado é tecnicamente visível e copiável; os avisos não são proteção anticópia.
 
 # C.E.R.B.E.R.U.S. — Engineering & Research Portfolio
 
@@ -34,6 +34,7 @@ CERBERUS Code Guard v0.10.0 scans Python source locally for selected risk patter
 | [10_EMPRESA](10_EMPRESA/README.md) | Organization, partners, and planning | Public-only reference; no personal documents |
 | [11_MODELOS_IA](11_MODELOS_IA/README.md) | Local AI / Ollama integration | Setup, model manifests, performance experiments |
 | [12_BACKUPS](12_BACKUPS/README.md) | Backup and reproducibility | Policies and restore instructions, no personal data |
+| [13_OLHO_QUE_TUDO_VE](13_OLHO_QUE_TUDO_VE/README.md) | O Olho Que Tudo Vê / FinGINT | Plataforma de simulação financeira geoespacial v1.1; apresentação pública, código proprietário não publicado |
 
 ## Important distinctions
 
