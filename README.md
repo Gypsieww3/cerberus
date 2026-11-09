@@ -22,6 +22,16 @@ CERBERUS Code Guard v0.10.0 scans Python source locally for selected risk patter
 
 ---
 
+## New public demonstrations and product information (November 2026)
+
+- [TERRA VIVA — open the browser demo](https://gypsieww3.github.io/cerberus-terra-viva-demo/) — static snapshot, not live human-level AI.
+- [Telemetry Studio — product details](docs/TELEMETRY_STUDIO_PUBLIC.md) — private, usable local CSV/SQLite prototype; 11 local tests and cross-platform CI.
+- [Core Commander — product details](docs/CORE_COMMANDER_PUBLIC.md) — private Windows engineering source, 104 local tests (one skipped), cross-platform delivery not certified.
+- [Code Guard — product information](CODE_GUARD.md) — private 0.10 source, automated Windows CI; supervised pilots only.
+- [Control Plane — read-only integration contract](docs/INTEGRATION_CONTRACT.md) — local localhost health monitoring, not unattended agent control.
+
+Public showcase: [clickable products and demos](projects.html). Software rights, testing limitations and commercial pilot conditions are documented separately.
+
 ## Projects
 
 | Folder | Project | Stage / existing evidence |

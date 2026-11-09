@@ -21,6 +21,10 @@ The developer's Windows PC passed 73 of 74 automated tests (one skipped because 
 
 The Windows executable is currently **unsigned**. It must not be run by bypassing corporate antivirus, SmartScreen or security policies. Compatibility with independent client machines has not yet been confirmed.
 
+## Source protection and reproducibility (9 November 2026)
+
+A private owner-only repository now preserves selected v0.10.0 Python source and regression tests; no public source checkout or binary license is granted. Private GitHub Actions workflows passed on Windows for Python 3.11 and 3.14. Source availability to the owner and passing automated tests **do not** establish external customer acceptance or a signed distributable installer.
+
 ## Request a demonstration
 
 **Engineering, QA and security teams:** [Open a Code Guard pilot inquiry](https://github.com/Gypsieww3/cerberus/issues/new?template=code-guard-pilot.md) to describe, in public and non-confidential terms, what your team would like to evaluate.
