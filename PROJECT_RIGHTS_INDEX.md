@@ -16,6 +16,9 @@ Este índice aplica a política de **direitos reservados sobre os trabalhos orig
 | 10 | Empresa | [Direitos](10_EMPRESA/RIGHTS_RESERVED.md) |
 | 11 | Modelos IA e integrações | [Direitos](11_MODELOS_IA/RIGHTS_RESERVED.md) |
 | 12 | Backups | [Direitos](12_BACKUPS/RIGHTS_RESERVED.md) |
+| 13 | O Olho Que Tudo Vê | [Apresentação e restrições](13_OLHO_QUE_TUDO_VE/README.md) |
+| 14 | Telemetry Studio | [Apresentação e restrições](docs/TELEMETRY_STUDIO_PUBLIC.md) |
+| 15 | TERRA VIVA | [Demonstração e limites](https://github.com/Gypsieww3/cerberus-terra-viva-demo/blob/main/LICENSE.txt) |
 
 A visualização das páginas públicas e a interação com a demonstração não concedem licença para copiar, modificar, redistribuir ou vender código original proprietário.
 
