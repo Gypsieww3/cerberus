@@ -11,6 +11,7 @@ import hmac
 import json
 import secrets
 from pathlib import Path
+from mission_engine import JobSupervisor, DEFAULT_DB, catalog
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
@@ -47,7 +48,7 @@ def snapshot(probe=probe_service):
         for s in CATALOG
     ]
 
-def make_server(port=8890, token=None, probe=probe_service):
+def make_server(port=8890, token=None, probe=probe_service, mission_engine=None, mission_db=None):
     if not isinstance(port, int) or not 0 <= port <= 65535:
         raise ValueError("port must be 0..65535")
     secret = token if token is not None else secrets.token_urlsafe(32)
@@ -55,6 +56,8 @@ def make_server(port=8890, token=None, probe=probe_service):
         raise ValueError("token must contain 32..512 characters")
     if any(c.isspace() or ord(c) < 33 or ord(c) > 126 for c in secret):
         raise ValueError("token must be printable ASCII without spaces")
+
+    missions = mission_engine if mission_engine is not None else JobSupervisor(db_path=mission_db or DEFAULT_DB)
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, fmt, *args):
@@ -84,6 +87,39 @@ def make_server(port=8890, token=None, probe=probe_service):
             self.end_headers()
             self.wfile.write(content)
 
+        def authorized(self):
+            values = self.headers.get_all("Authorization", [])
+            prefix = "Bearer "
+            return (len(values) == 1 and values[0].startswith(prefix)
+                    and hmac.compare_digest(values[0][len(prefix):], secret))
+
+        def same_origin(self):
+            port_str = str(self.server.server_port)
+            allowed = {"127.0.0.1:" + port_str, "localhost:" + port_str}
+            host = self.headers.get("Host", "")
+            origin = self.headers.get("Origin")
+            return host in allowed and (origin is None or origin == "http://" + host)
+
+        def read_json(self):
+            if self.headers.get("Transfer-Encoding"):
+                raise ValueError("Transferência não suportada")
+            if self.headers.get("Content-Type", "").split(";")[0].strip().lower() != "application/json":
+                raise ValueError("Content-Type deve ser application/json")
+            try:
+                size = int(self.headers.get("Content-Length", "-1"))
+            except ValueError:
+                raise ValueError("Content-Length inválido") from None
+            if not 1 <= size <= 2048:
+                raise ValueError("Corpo JSON deve ter entre 1 e 2048 bytes")
+            raw = self.rfile.read(size)
+            try:
+                data = json.loads(raw.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                raise ValueError("JSON inválido") from None
+            if type(data) is not dict:
+                raise ValueError("Esperado objeto JSON")
+            return data
+
         def do_GET(self):
             if self.path == "/":
                 return self.send_asset("control_plane.html", "text/html; charset=utf-8")
@@ -92,27 +128,64 @@ def make_server(port=8890, token=None, probe=probe_service):
             if self.path == "/control_plane.css":
                 return self.send_asset("control_plane.css", "text/css; charset=utf-8")
             if self.path == "/healthz":
-                return self.send_json(200, {"service": "cerberus-control-plane", "status": "ok", "mode": "read-only"})
-            supplied = self.headers.get("Authorization", "")
-            prefix = "Bearer "
-            if not supplied.startswith(prefix) or not hmac.compare_digest(supplied[len(prefix):], secret):
+                return self.send_json(200, {"service": "cerberus-control-plane", "status": "ok", "mode": "supervised-docker"})
+            if not self.same_origin():
+                return self.send_json(403, {"error": "invalid host or origin"})
+            if not self.authorized():
                 return self.send_json(401, {"error": "authentication required"})
             if self.path == "/api/v1/services":
                 return self.send_json(200, {"schema": 1, "services": snapshot(probe)})
+            if self.path == "/api/v1/missions/catalog":
+                return self.send_json(200, {"schema": 1, "tasks": catalog()})
+            if self.path == "/api/v1/missions":
+                return self.send_json(200, {"schema": 1, "missions": missions.recent()})
+            if self.path.startswith("/api/v1/missions/"):
+                mid = self.path[len("/api/v1/missions/"):]
+                try:
+                    item = missions.get(mid)
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid mission ID"})
+                return self.send_json(200, item) if item else self.send_json(404, {"error": "unknown mission"})
             return self.send_json(404, {"error": "route not found"})
 
         def do_POST(self):
-            return self.send_json(405, {"error": "read-only API"})
-        do_PUT = do_POST
-        do_DELETE = do_POST
-        do_PATCH = do_POST
+            routes = ("/api/v1/missions/prepare", "/api/v1/missions/start", "/api/v1/missions/cancel")
+            if self.path not in routes:
+                return self.send_json(405, {"error": "method not allowed"})
+            if not self.same_origin():
+                return self.send_json(403, {"error": "invalid host or origin"})
+            if not self.authorized():
+                return self.send_json(401, {"error": "authentication required"})
+            try:
+                data = self.read_json()
+                if self.path == routes[0]:
+                    if set(data) != {"task_id"}:
+                        raise ValueError("Payload não permitido")
+                    return self.send_json(200, missions.prepare(data["task_id"]))
+                if self.path == routes[1]:
+                    if set(data) != {"ticket", "approve"}:
+                        raise ValueError("Payload não permitido")
+                    return self.send_json(202, missions.start(data["ticket"], data["approve"]))
+                if set(data) != {"id"}:
+                    raise ValueError("Payload não permitido")
+                return self.send_json(202, missions.cancel(data["id"]))
+            except ValueError as err:
+                return self.send_json(400, {"error": str(err)})
+            except RuntimeError as err:
+                return self.send_json(409, {"error": str(err)})
+        def method_not_allowed(self):
+            return self.send_json(405, {"error": "method not allowed"})
+        do_PUT = method_not_allowed
+        do_DELETE = method_not_allowed
+        do_PATCH = method_not_allowed
 
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     server.auth_token = secret
+    server.missions = missions
     return server
 
 def main():
-    parser = argparse.ArgumentParser(description="CERBERUS local, read-only control plane")
+    parser = argparse.ArgumentParser(description="CERBERUS local, supervised engineering control plane")
     parser.add_argument("--port", type=int, default=8890)
     parser.add_argument("--once", action="store_true", help="Print a one-time status snapshot; no HTTP server")
     args = parser.parse_args()
@@ -120,9 +193,14 @@ def main():
         print(json.dumps({"services": snapshot()}, ensure_ascii=False, indent=2))
         return
     with make_server(port=args.port) as server:
-        print("CERBERUS Control Plane: http://127.0.0.1:%d/" % server.server_port)
+        print("CERBERUS Control Plane (Docker supervised): http://127.0.0.1:%d/" % server.server_port)
         print("Access token (do not share): " + server.auth_token)
-        server.serve_forever(poll_interval=0.25)
+        try:
+            server.serve_forever(poll_interval=0.25)
+        except KeyboardInterrupt:
+            print("Encerramento solicitado")
+        finally:
+            server.missions.shutdown()
 
 if __name__ == "__main__":
     main()

@@ -6,9 +6,11 @@
 
 Experimental technology initiative in Curitiba, Brazil. The repository contains independent projects and a shared engineering roadmap. **Not all listed projects are completed or commercially validated.**
 
-## New: local CERBERUS Control Plane (Alpha 0.1)
+## Local CERBERUS Control Plane — Alpha 0.2
 
-A **working, read-only control panel** can check the health of approved localhost APIs for MOSS Lab, Telemetry Studio and O Olho Que Tudo Vê. It does **not** execute programs or give autonomous access to the computer. Run `03_CERBERUS_CORE/ABRIR_CONTROL_PLANE.bat` on Windows, then open `http://127.0.0.1:8890/` and enter the temporary token displayed in the terminal. See [integration contract](docs/INTEGRATION_CONTRACT.md) and [product verification matrix](docs/RELEASE_MATRIX.md).
+A local dashboard monitors MOSS Lab, Telemetry Studio and O Olho Que Tudo Vê. **New:** it now supports **three explicitly approved engineering checks** through Docker (Python regression tests, RISC-V reference tests and a synthetic robotics torque calculation). Each check has a fixed command, an expiring one-use approval ticket, SQLite audit history, cancellation, no container network access and time/memory/CPU limits. There is **no arbitrary command entry**, unattended PC control or autonomous changes to projects.
+
+On Windows run `03_CERBERUS_CORE/ABRIR_CONTROL_PLANE.bat`; open `http://127.0.0.1:8890/` and enter the temporary terminal token. The supervised tasks require Docker Desktop running and a *previously downloaded* `python:3.12-alpine` image; the application will not automatically download images. See the [integration contract](docs/INTEGRATION_CONTRACT.md) and [product verification matrix](docs/RELEASE_MATRIX.md).
 
 ## Featured software — CERBERUS Code Guard
 
@@ -28,7 +30,7 @@ CERBERUS Code Guard v0.10.0 scans Python source locally for selected risk patter
 - [Telemetry Studio — product details](docs/TELEMETRY_STUDIO_PUBLIC.md) — private, usable local CSV/SQLite prototype; 11 local tests and cross-platform CI.
 - [Core Commander — product details](docs/CORE_COMMANDER_PUBLIC.md) — private Windows engineering source, 104 local tests (one skipped), cross-platform delivery not certified.
 - [Code Guard — product information](CODE_GUARD.md) — private 0.10 source, automated Windows CI; supervised pilots only.
-- [Control Plane — read-only integration contract](docs/INTEGRATION_CONTRACT.md) — local localhost health monitoring, not unattended agent control.
+- [Control Plane — supervised Docker integration](docs/INTEGRATION_CONTRACT.md) — local health monitoring and approved, bounded engineering checks; no unattended agent control.
 
 Public showcase: [clickable products and demos](projects.html). Software rights, testing limitations and commercial pilot conditions are documented separately.
 
