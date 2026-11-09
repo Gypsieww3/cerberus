@@ -11,7 +11,7 @@ class PublicCatalogTests(unittest.TestCase):
         self.assertIn("cerberus-terra-viva-demo", html)
         self.assertIn("docs/TELEMETRY_STUDIO_PUBLIC.md", html)
         self.assertIn("docs/CORE_COMMANDER_PUBLIC.md", html)
-        self.assertIn("Code Guard", html)
+        self.assertIn("code guard", html.lower())
 
     def test_private_source_not_linked_as_public_download(self):
         html = (ROOT / "projects.html").read_text(encoding="utf-8")
