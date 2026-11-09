@@ -6,6 +6,10 @@
 
 Experimental technology initiative in Curitiba, Brazil. The repository contains independent projects and a shared engineering roadmap. **Not all listed projects are completed or commercially validated.**
 
+## New: local CERBERUS Control Plane (Alpha 0.1)
+
+A **working, read-only control panel** can check the health of approved localhost APIs for MOSS Lab, Telemetry Studio and O Olho Que Tudo Vê. It does **not** execute programs or give autonomous access to the computer. Run `03_CERBERUS_CORE/ABRIR_CONTROL_PLANE.bat` on Windows, then open `http://127.0.0.1:8890/` and enter the temporary token displayed in the terminal. See [integration contract](docs/INTEGRATION_CONTRACT.md) and [product verification matrix](docs/RELEASE_MATRIX.md).
+
 ## Featured software — CERBERUS Code Guard
 
 **Python static-analysis desktop tool | Windows | Proprietary | Supervised pilot by request**

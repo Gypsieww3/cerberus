@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C.E.R.B.E.R.U.S. — Control Plane</title><link rel="stylesheet" href="/control_plane.css"></head>
+<body><main><header><div class="eyebrow">C.E.R.B.E.R.U.S. · CENTRO DE ENGENHARIA</div><h1>Control Plane <small>Alpha 0.1</small></h1><p>Observatório local de serviços. Não inicia aplicações nem executa comandos.</p></header>
+<section class="panel"><label for="token">Token de acesso mostrado no terminal</label><div class="toolbar"><input id="token" type="password" autocomplete="off" placeholder="Token temporário" aria-label="Token de acesso"><button id="load">Verificar serviços</button></div><p id="message" role="status">Insere o token para consultar os serviços locais.</p></section>
+<div id="services" class="grid" aria-live="polite"></div><footer>Execução local em 127.0.0.1 · Estado «acessível» não comprova segurança ou prontidão comercial · Sem controlo remoto</footer></main>
+<script src="/control_plane.js" defer></script></body></html>
