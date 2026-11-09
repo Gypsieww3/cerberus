@@ -1,45 +1,65 @@
-# C.E.R.B.E.R.U.S. — Integration Contract (Alpha 0.1)
+# C.E.R.B.E.R.U.S. — Control Plane Alpha 0.2: contrato de integração
 
-Status: **implemented local read-only bridge**, not a remote-control agent or complete program integration.
+**Implementado:** centro local de observação + missões de engenharia de execução supervisionada.
+**Não implementado:** autonomia livre, código gerado/executado por IA, operações financeiras reais, controlo de hardware, API multiutilizador ou servidor Internet.
 
-## Start
+## Iniciar
 
-On Windows, run `03_CERBERUS_CORE/ABRIR_CONTROL_PLANE.bat` (Python 3.11+ standard library).
-Open `http://127.0.0.1:8890/` and enter the ephemeral access token shown in the terminal.
-The token is not saved to browser storage. Never post it on GitHub.
+No Windows, com Python 3.11+:
+- Fazer duplo clique no atalho **CERBERUS Control Plane** ou em `03_CERBERUS_CORE/ABRIR_CONTROL_PLANE.bat`.
+- Abrir `http://127.0.0.1:8890/` **no mesmo computador**.
+- Copiar o token de sessão que aparece no terminal; nunca o publicar.
+- Selecionar uma missão, clicar **Preparar missão**, ler o resumo e depois **Aprovar e executar**. A preparação isoladamente não executa código.
+- Clicar **Consultar resultado** para atualizar o estado. **Cancelar missão** pede a paragem do contentor.
 
-Or run `py -3 03_CERBERUS_CORE/control_plane.py --once` for a one-off terminal snapshot.
+Para consultar apenas serviços no terminal: `py -3 03_CERBERUS_CORE/control_plane.py --once`.
 
-## Contract
+## Requisitos das missões
 
-- `GET /healthz` — no authentication; reports the Control Plane process, **not** any downstream application.
-- `GET /api/v1/services` — requires `Authorization: Bearer <token>`; responds with schema version 1 and an array of `id, name, kind, status`.
-- `POST/PUT/PATCH/DELETE` — rejected (HTTP 405).
-- Assets `/`, `/control_plane.js`, and `/control_plane.css` are served locally.
-- Values: `reachable` (GET health responded 2xx), `unavailable` (could not confirm healthy endpoint), `not_integrated` (no probe exists).
-- A service being reachable is **not** proof of secure operation, functional correctness, or commercial readiness.
+Docker Desktop em funcionamento, com a imagem `python:3.12-alpine` já presente localmente. O comando Docker usa `--pull=never`; nunca descarrega imagem em execução.
 
-## Known local probes
+A execução local foi verificada em 9/11/2026 no Windows:
+- Regressões Python: **85 testes aprovados em Docker**, para esta versão de desenvolvimento.
+- Verificador de referência RISC-V: concluído (não é simulação RTL ou teste FPGA).
+- Robótica: cálculo estático concluído (não é medição de hardware).
 
-| Service | Probe | Limitation |
+A aprovação de cada missão é limitada a 90 segundos e utilizável uma única vez. Só uma missão pode executar de cada vez.
+
+## Contrato HTTP (versão 1)
+
+Todos os endpoints `/api/v1/*` exigem `Authorization: Bearer <token>` e Host local. O servidor apenas escuta `127.0.0.1`; a presença do cabeçalho Origin é verificada em pedidos autenticados. Pedidos POST exigem `Content-Type: application/json`, objeto JSON com esquema exato e corpo até 2 KiB.
+
+| Método | Endpoint | Efeito |
 | --- | --- | --- |
-| MOSS Lab | `127.0.0.1:8765/api/v1/health` | Historical MOSS engine is separate |
-| Telemetry Studio | `127.0.0.1:8878/api/health` | CSV/SQLite app; does not read live industrial sensors |
-| O Olho Que Tudo Vê | `127.0.0.1:8876/healthz` | **Set `OLHO_PORT=8876` before starting**, because MOSS Lab uses 8765 |
-| Core Commander | Not integrated | No supported health adapter yet |
-| Code Guard | Not integrated | Desktop product; no supported local API |
-| TERRA VIVA | Not integrated | Public site is a static snapshot |
+| GET | `/healthz` | Saúde do processo local, sem autenticação (não prova que Docker está disponível) |
+| GET | `/api/v1/services` | Estado de saúde HTTP dos serviços conhecidos |
+| GET | `/api/v1/missions/catalog` | Lista fixa de tarefas aprovadas |
+| POST | `/api/v1/missions/prepare` | Recebe `{"task_id": "robotics_static"}`; devolve ticket efémero sem executar |
+| POST | `/api/v1/missions/start` | Recebe `{"ticket": "...", "approve": true}`; inicia a missão aprovada |
+| GET | `/api/v1/missions` | Últimos 15 registos |
+| GET | `/api/v1/missions/<uuid>` | Detalhes e saída limitada a 5000 caracteres |
+| POST | `/api/v1/missions/cancel` | Recebe `{"id": "<uuid>"}`; solicita cancelamento |
 
-The probe targets are hard-coded reviewed loopback URLs: the API does not accept user-supplied URLs, paths or commands.
+Todos os outros POST/PUT/PATCH/DELETE são rejeitados. Os comandos Docker não são controlados pelo conteúdo dos pedidos. Não existe endpoint para executar shell, fornecer argumentos, imagens, mounts, URLs, comandos personalizados ou código livre.
 
-## Security constraints
+## Catálogo imutável desta versão
 
-Only binds to `127.0.0.1`. Local Bearer authentication uses a random token at each start, constant-time comparison, response `Cache-Control: no-store`, no wildcard CORS, CSP for static assets and no persistent log of tokens or queries. No filesystem writes, arbitrary scripts, plugin execution, cloud access or remote control. Anyone able to read the displayed token on the local computer can access the status list. Do not expose this development endpoint via reverse proxy or public tunnel.
+1. `engineering_tests`: `python tools/test_engineering.py`, tempo máximo 60 s.
+2. `riscv_reference`: `python 09_HARDWARE/RV32I_TRACE/tools/verify_reference.py`, 20 s.
+3. `robotics_static`: cálculo Python com argumentos fixos e sintéticos, 20 s.
 
-## Next integration stages
+Todas as operações acontecem dentro de um contentor Docker: rede desativada, imagem previamente armazenada, 1 CPU, 384 MiB RAM, 64 PIDs, UID não-root, capacidades Linux removidas, no-new-privileges, sistema de ficheiros e montagem do repositório só para leitura, apenas `/tmp` temporário em memória. Não existe fallback de execução no host.
 
-1. Standardize opt-in health endpoints and API versions in desktop apps **without introducing PC command execution**.
-2. Add durable, scoped capability permissions for individual agent actions.
-3. Integrate event schema, audit log, sandbox execution, rollback and cancellation.
-4. Validate on the owner's Windows environment and external test machines.
-5. Consider a separate authenticated commercial API only after threat modelling.
+## Estados e auditoria
+
+- `RUNNING` → `PASSED`, `FAILED` ou `TIMED_OUT`.
+- Quando o utilizador cancela: `CANCELLING` → `CANCELLED`.
+- Após reinício, missões que estavam em `RUNNING` ou `CANCELLING` ficam registadas como `INTERRUPTED`; isso não é prova de que um contentor órfão foi eliminado.
+
+Histórico SQLite local: `~/.cerberus/control_plane/missions.sqlite3`. **Não existe encriptação em repouso**, nem limpeza automática dos registos nesta Alpha. A saída é truncada e algumas formas de token são ocultadas por heurística; isto **não substitui uma auditoria de segredos**.
+
+## Segurança, limites e próximos marcos
+
+Não abrir esta API ao público, não criar tunnels ou reverse proxies e não usá-la em repositórios de clientes com código não confiável. Docker restringe capacidades mas não é uma garantia absoluta contra vulnerabilidades do kernel/runtime. Inspeção de qualidade e de segurança externa ainda está pendente.
+
+A versão Alpha 0.2 **não** integra ainda o motor MOSS nem o Core Commander/Code Guard como executores de missões. O próximo marco é estabelecer uma API de capacidades granular para que o MOSS possa propor tarefas, sujeitas a revisão humana, testes e rollback — sem autoperpetuação de permissões.

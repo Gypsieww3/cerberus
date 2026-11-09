@@ -36,7 +36,7 @@ class ControlPlaneTests(unittest.TestCase):
         self.assertEqual(self.server.server_address[0], "127.0.0.1")
         status, body, headers = self.call("GET", "/healthz")
         self.assertEqual(status, 200)
-        self.assertEqual(json.loads(body)["mode"], "read-only")
+        self.assertEqual(json.loads(body)["mode"], "supervised-docker")
         self.assertEqual(headers["Cache-Control"], "no-store")
         self.assertEqual(self.call("POST", "/api/v1/services", "x" * 40)[0], 405)
 
