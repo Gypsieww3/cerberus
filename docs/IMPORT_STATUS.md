@@ -1,5 +1,7 @@
 # GitHub source import status — 2026-11-06
 
+> **Documento histórico.** Esta secção descreve o estado em 6/11/2026, não o inventário atual. Desde então, RTL SystemVerilog foi publicado na pasta RV32I-TRACE, existe um MOSS Lab operacional no GitHub, e novos repositórios privados contêm fonte do Code Guard, Commander, Olho Que Tudo Vê, Telemetry Studio e os programas TERRA VIVA. Consulte [RELEASE_MATRIX.md](RELEASE_MATRIX.md) para o estado verificado mais recente.
+
 ## Confirmed published on main
 
 - Original website: `index.html` at root, preserved and deployed by GitHub Pages.
