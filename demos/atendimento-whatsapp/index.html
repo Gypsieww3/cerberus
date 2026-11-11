@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="CERBERUS — Demonstração de atendimento por regras. Não envia mensagens reais."><title>CERBERUS | Atendimento por regras</title>
+<style>
+:root{color-scheme:dark;--bg:#07110f;--panel:#11251c;--line:#345c4a;--green:#a8f65a;--text:#ecf8f0;--muted:#b7c8c0}
+*{box-sizing:border-box}body{background:radial-gradient(ellipse at 80% 0%,#194332,transparent 45%),var(--bg);color:var(--text);font:16px/1.55 system-ui,Segoe UI,sans-serif;margin:0}
+header{padding:18px max(20px,calc((100% - 1050px)/2));border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header strong{letter-spacing:.1em}a{color:var(--green)}
+main{max-width:1100px;margin:auto;padding:38px 20px 70px}.eyebrow{color:var(--green);letter-spacing:.15em;font:700 .75rem monospace}h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.08;letter-spacing:-.05em;margin:14px 0}h1 span{color:var(--green)}
+p{color:var(--muted)}.warning{border:1px solid #966a46;background:#291e17;color:#ffe0a8;border-radius:10px;padding:12px 17px;margin:23px 0}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.panel{border:1px solid var(--line);border-radius:15px;background:var(--panel);overflow:hidden}.panel h2{font-size:1.1rem;margin:0;padding:17px 20px;border-bottom:1px solid var(--line)}
+.chat{height:375px;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:88%;padding:10px 14px;border-radius:13px;overflow-wrap:anywhere;white-space:pre-wrap}.customer{align-self:flex-end;background:var(--green);color:#08130d}.bot{align-self:flex-start;background:#254735}.alert{align-self:flex-start;background:#382819;color:#ffe0a8;font-size:.85rem}
+form{border-top:1px solid var(--line);padding:14px;display:flex;gap:8px}input{flex:1;min-width:0;font:inherit;border:1px solid var(--line);background:#091711;color:white;padding:11px;border-radius:8px}
+button{cursor:pointer;background:var(--green);color:#0c180d;border:0;border-radius:8px;padding:10px 13px;font:700 .9rem system-ui}button.secondary{background:transparent;color:var(--green);border:1px solid var(--green)}button:focus-visible,input:focus-visible{outline:3px solid white;outline-offset:2px}
+.samples{padding:12px 16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px}.rules{padding:15px 19px}.rule{padding:12px 0;border-bottom:1px solid var(--line);color:var(--muted)}.rule:last-child{border:0}
+.counts{display:flex;gap:22px;flex-wrap:wrap;margin:20px 0;color:var(--muted)}.counts strong{color:white}.after{padding:20px;margin-top:20px}
+footer{border-top:1px solid var(--line);text-align:center;padding:25px;color:var(--muted);font-size:.82rem}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.chat{height:320px}}
+</style></head><body>
+<header><strong>C.E.R.B.E.R.U.S. / PROTOTYPES</strong><a href="../../servicos.html">Serviços e contacto</a></header>
+<main><div class="eyebrow">PROTÓTIPO INTERATIVO · 11 NOV 2026</div><h1>Respostas simples. <span>Controlo humano.</span></h1>
+<p>Simule um bot de atendimento com respostas predefinidas e encaminhamento de pedidos complexos. O motor segue regras verificáveis e não inventa preços ou prazos.</p>
+<div class="warning"><strong>DEMONSTRAÇÃO OFFLINE:</strong> não está ligado ao WhatsApp ou Meta, não envia mensagens, não guarda conversas e não está pronto para atender clientes reais.</div>
+<div class="grid"><section class="panel"><h2>Teste uma conversa</h2><div class="chat" id="chat" role="log" aria-live="polite"></div>
+<form id="frm"><input id="entry" aria-label="Mensagem de teste" placeholder="Qual é o horário?" required maxlength="500" autocomplete="off"><button type="submit">Testar</button></form>
+<div class="samples"><button type="button" class="secondary" data-msg="Olá">Olá</button><button type="button" class="secondary" data-msg="Quanto custa?">Preço</button><button type="button" class="secondary" data-msg="Qual o frete?">Entrega</button><button type="button" class="secondary" data-msg="Preciso de atendente">Humano</button><button type="button" class="secondary" id="reset">Limpar</button></div></section>
+<section class="panel"><h2>Regras disponíveis</h2><div class="rules"><p>As respostas são ilustrativas. O cliente define e aprova regras, preços, horários e políticas reais antes de integrar.</p><div id="rules"></div></div></section></div>
+<div class="counts"><div>Mensagens de teste: <strong id="total">0</strong></div><div>Respostas por regra: <strong id="match">0</strong></div><div>Encaminhamentos: <strong id="human">0</strong></div></div>
+<section class="panel after"><h2 style="padding:0;border:0">Para transformar em um produto real</h2><p>É preciso definir escopo, obter acesso autorizado à API oficial de mensagens, tratar dados de forma segura, prevenir envios duplicados, validar custos e testar com autorização. O protótipo não substitui essa integração.</p><a href="mailto:wrkus2025@gmail.com?subject=CERBERUS%20-%20Piloto%20de%20bot">Pedir orçamento para piloto supervisionado</a></section>
+</main><footer>© 2026 CERBERUS · Dados fictícios · Nenhuma mensagem enviada</footer>
+<script>
+const RULES=[{"id":"humano","label":"Atendente humano","terms":["atendente","humano","reclamacao","problema","devolucao"],"reply":"Vou encaminhar o pedido para atendimento humano. Por favor, descreva o que aconteceu.","handoff":true},{"id":"horario","label":"Horário","terms":["horario","funcionamento","abre","fecha"],"reply":"O horário de atendimento é configurado pela empresa. Quer consultar outro assunto?","handoff":false},{"id":"preco","label":"Orçamento","terms":["preco","valor","quanto custa","orcamento"],"reply":"Para pedir um orçamento, informe o produto ou serviço e a quantidade. Um responsável confirmará o valor.","handoff":false},{"id":"entrega","label":"Entrega","terms":["entrega","frete","envio"],"reply":"Informe o produto e a região para solicitar um prazo de entrega. Um responsável confirmará os detalhes.","handoff":false},{"id":"pedido","label":"Pedido","terms":["pedido","rastreio","rastrear"],"reply":"Um atendente verificará o estado do pedido. Não introduza dados bancários neste protótipo.","handoff":true},{"id":"saudacao","label":"Saudação","terms":["ola","oi","bom dia","boa tarde"],"reply":"Olá! Posso ajudar com horários, preços e entregas ou encaminhar para um atendente.","handoff":false}];
+function normal(s){return String(s??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g," ")}
+function respond(message,rs){
+const val=normal(message);
+if(!val)return {id:"vazio",reply:"Escreva uma pergunta.",matched:false,handoff:false};
+if(val.length>500)return {id:"limite",reply:"A mensagem excede 500 caracteres.",matched:false,handoff:true};
+const padded=" "+val.replace(/[^a-z0-9]+/g," ")+" ";
+for(const r of rs){if(r.terms.some(t=>padded.includes(" "+normal(t).replace(/[^a-z0-9]+/g," ")+" ")))return {id:r.id,reply:r.reply,matched:true,handoff:r.handoff}}
+return {id:"desconhecido",reply:"Não encontrei resposta segura. Vou encaminhar a sua questão para uma pessoa.",matched:false,handoff:true}
+}
+const chat=document.getElementById("chat"),input=document.getElementById("entry");
+const stats={total:0,match:0,human:0};
+function bubble(t,k){const el=document.createElement("div");el.className="bubble "+k;el.textContent=t;chat.append(el);chat.scrollTop=chat.scrollHeight}
+function send(t){const s=String(t).trim();if(!s)return;bubble(s,"customer");const r=respond(s,RULES);bubble(r.reply,"bot");stats.total++;stats.match+=Number(r.matched);stats.human+=Number(r.handoff);if(r.handoff)bubble("Requer intervenção humana. Nenhum atendimento real foi notificado.","alert");for(const k in stats)document.getElementById(k).textContent=stats[k]}
+document.getElementById("frm").addEventListener("submit",e=>{e.preventDefault();send(input.value);input.value="";input.focus()});
+for(const b of document.querySelectorAll("[data-msg]"))b.addEventListener("click",()=>send(b.dataset.msg));
+document.getElementById("reset").addEventListener("click",()=>{chat.replaceChildren();for(const k in stats){stats[k]=0;document.getElementById(k).textContent=0}bubble("Demonstração iniciada. Experimente fazer uma pergunta.","bot")});
+for(const r of RULES){const d=document.createElement("div");d.className="rule";d.textContent=r.label+" — "+r.terms.slice(0,3).join(", ");document.getElementById("rules").append(d)}
+document.getElementById("reset").click();
+</script>
+</body></html>
