@@ -26,6 +26,20 @@ Encontrar necessidades reais de clientes, propor soluções pequenas e verificá
 
 Oferta pública: [servicos.html](../servicos.html). Evidências técnicas: [portefólio](../projects.html).
 
+## Primeiro lead priorizado — 11/11/2026
+
+**Fonte:** https://www.workana.com/pt/job/desenvolvimento-de-sistema-de-resposta-automatica-para-whatsapp-1
+
+- **Anúncio:** Sistema de resposta automática para WhatsApp, publicado em 10/11/2026.
+- **Estado público:** aberto, analisando propostas; 24 propostas quando verificado em 11/11/2026.
+- **Pedido:** identificar mensagens recebidas e devolver respostas por regras ou mensagens predefinidas; o cliente ainda vai detalhar o escopo.
+- **Orçamento do anunciante:** não divulgado. **Prazo do anunciante:** não estabelecido.
+- **Evidência nossa:** [simulação interativa local](../demos/atendimento-whatsapp/index.html), com motor determinístico e oito verificações básicas realizadas, SEM integração com WhatsApp.
+- **Estado comercial:** oportunidade identificada; demonstração técnica criada; **não contactado, proposta não enviada, contrato inexistente, receita zero**.
+- **Proposta inicial sugerida, não vinculativa:** R$ 1.490 por piloto restrito a um número, até seis regras aprovadas, integração autorizada com API oficial e testes básicos; prazo estimado de 7 dias úteis após acessos e escopo claros. Hospedagem e mensagens cobradas pela Meta não incluídas. Reestimar se houver painel administrativo, IA generativa, CRM, templates fora da janela, elevado volume ou requisitos adicionais.
+- **Pré-requisitos:** perfil Workana aprovado, âmbito contratual/fiscal regularizado, credenciais fornecidas em canal seguro, existência de conta WhatsApp Business habilitada e validação de custo/limites.
+- **Próxima autorização:** titular decide se envia candidatura. Nunca copiar contactos, e-mails ou URLs pessoais para propostas na Workana em violação dos termos da plataforma.
+
 ## Funil e condições de avanço
 
 1. **Identificada:** pedido público com URL, data e requisitos.
